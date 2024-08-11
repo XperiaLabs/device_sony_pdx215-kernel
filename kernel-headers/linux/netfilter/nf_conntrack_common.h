@@ -93,8 +93,7 @@ enum ip_conntrack_status {
 	IPS_UNTRACKED_BIT = 12,
 	IPS_UNTRACKED = (1 << IPS_UNTRACKED_BIT),
 
-
-	/* Conntrack got a helper explicitly attached (ruleset, ctnetlink). */
+	/* Conntrack got a helper explicitly attached via CT target. */
 	IPS_HELPER_BIT = 13,
 	IPS_HELPER = (1 << IPS_HELPER_BIT),
 
@@ -102,19 +101,14 @@ enum ip_conntrack_status {
 	IPS_OFFLOAD_BIT = 14,
 	IPS_OFFLOAD = (1 << IPS_OFFLOAD_BIT),
 
-	/* Conntrack has been offloaded to hardware. */
-	IPS_HW_OFFLOAD_BIT = 15,
-	IPS_HW_OFFLOAD = (1 << IPS_HW_OFFLOAD_BIT),
-
 	/* Be careful here, modifying these bits can make things messy,
 	 * so don't let users modify them directly.
 	 */
 	IPS_UNCHANGEABLE_MASK = (IPS_NAT_DONE_MASK | IPS_NAT_MASK |
 				 IPS_EXPECTED | IPS_CONFIRMED | IPS_DYING |
-				 IPS_SEQ_ADJUST | IPS_TEMPLATE | IPS_UNTRACKED |
-				 IPS_OFFLOAD | IPS_HW_OFFLOAD),
+				 IPS_SEQ_ADJUST | IPS_TEMPLATE | IPS_OFFLOAD),
 
-	__IPS_MAX_BIT = 16,
+	__IPS_MAX_BIT = 15,
 };
 
 /* Connection tracking event types */
@@ -133,6 +127,8 @@ enum ip_conntrack_events {
 	IPCT_LABEL,		/* new connlabel has been set */
 	IPCT_SYNPROXY,		/* synproxy has been set */
 };
+
+#define IPCT_COUNTER IPCT_COUNTER
 
 enum ip_conntrack_expect_events {
 	IPEXP_NEW,		/* new expectation */

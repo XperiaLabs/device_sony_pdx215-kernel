@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
  * Copyright (c) 2019-2020, The Linux Foundation. All rights reserved.
- * Copyright (c) 2021 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #ifndef _SPSS_UTILS_H_
@@ -20,7 +19,7 @@
 #define SPSS_IOC_MAGIC  'S'
 
 /* ---------- set fw cmac --------------------------------- */
-#define OLD_NUM_SPU_UEFI_APPS	3 /* Obsolete */
+#define OLD_NUM_SPU_UEFI_APPS   3   /* Obsolete */
 
 #define CMAC_SIZE_IN_WORDS	4
 
@@ -72,7 +71,7 @@ struct spss_ioc_signal_event {
 #define SPSS_IOC_SIGNAL_EVENT \
 	_IOWR(SPSS_IOC_MAGIC, 3, struct spss_ioc_signal_event)
 
-/* ---------- is event signaled ------------------------------ */
+/* ---------- is event isgnaled ------------------------------ */
 struct spss_ioc_is_signaled {
 	__u32 event_id;      /* input */
 	__u32 status;        /* output */

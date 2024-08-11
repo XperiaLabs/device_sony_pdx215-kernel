@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
- * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
  */
 
 #ifndef _SDE_DRM_H_
@@ -43,44 +42,6 @@ extern "C" {
 #define SCALER_LUT_UV_SEP_WR		0x20
 
 /**
- * DRM format modifier tokens
- *
- * @DRM_FORMAT_MOD_QCOM_DX:         Refers to a DX variant of the base format.
- *                                  Implementation may be platform and
- *                                  base-format specific.
- */
-#define DRM_FORMAT_MOD_QCOM_DX	fourcc_mod_code(QCOM, 0x2)
-
-/**
- * @DRM_FORMAT_MOD_QCOM_TIGHT:      Refers to a tightly packed variant of the
- *                                  base variant. Implementation may be
- *                                  platform and base-format specific.
- */
-#define DRM_FORMAT_MOD_QCOM_TIGHT	fourcc_mod_code(QCOM, 0x4)
-
-/**
- * @DRM_FORMAT_MOD_QCOM_TILE:       Refers to a tile variant of the base format.
- *                                  Implementation may be platform and
- *                                  base-format specific.
- */
-#define DRM_FORMAT_MOD_QCOM_TILE	fourcc_mod_code(QCOM, 0x8)
-
-/**
- * @DRM_FORMAT_MOD_QCOM_ALPHA_SWAP:	Refers to a pixel format for which
- *					its alpha ordering has been reversed.
- *					Implementation may be platform and
- *					base-format specific.
- */
-#define DRM_FORMAT_MOD_QCOM_ALPHA_SWAP	fourcc_mod_code(QCOM, 0x10)
-
-/*
- * @DRM_FORMAT_MOD_QCOM_FSC_TILE:	Refers to a tile variant of the
- *					planar format. Implementation may be
- *					platform and base-format specific.
- */
-#define DRM_FORMAT_MOD_QCOM_FSC_TILE       fourcc_mod_code(QCOM, 0x20)
-
-/**
  * Blend operations for "blend_op" property
  *
  * @SDE_DRM_BLEND_OP_NOT_DEFINED:   No blend operation defined for the layer.
@@ -106,17 +67,6 @@ extern "C" {
 #define SDE_DRM_BLEND_OP_COVERAGE       3
 #define SDE_DRM_BLEND_OP_MAX            4
 #define SDE_DRM_BLEND_OP_SKIP           5
-
-/**
- * Sys Cache types for "syscache_type" property
- *
- * @SDE_SYSCACHE_LLCC_DISP:	Syscache type is default, LLCC_DISP.
- * @SDE_SYSCACHE_LLCC_EVA_LEFT:	Syscache type is eva left, LLCC_EVALFT.
- * @SDE_SYSCACHE_LLCC_EVA_RIGHT:Syscache type is eva right, LLCC_EVARGHT.
- */
-#define SDE_SYSCACHE_LLCC_DISP		0
-#define SDE_SYSCACHE_LLCC_EVA_LEFT	1
-#define SDE_SYSCACHE_LLCC_EVA_RIGHT	2
 
 /**
  * Bit masks for "src_config" property
@@ -472,9 +422,6 @@ struct sde_drm_color {
 /* Color fill outside of the rect, excluding border */
 #define SDE_DRM_DIM_LAYER_EXCLUSIVE     0x2
 
- /* bitmask for allowed_dsc_reservation_switch property */
-#define SDE_DP_DSC_RESERVATION_SWITCH (1 << 0)
-
 /**
  * struct sde_drm_dim_layer - dim layer cfg struct
  * @flags:         Refer SDE_DRM_DIM_LAYER_CONFIG_FLAG for possible values
@@ -547,92 +494,6 @@ struct sde_drm_roi_v1 {
 #define SDE_RECOVERY_SUCCESS		0
 #define SDE_RECOVERY_CAPTURE		1
 #define SDE_RECOVERY_HARD_RESET		2
-
-/**
- * Define UBWC statistics config
- */
-#define UBWC_STATS_MAX_ROI		0x3
-
-/**
- * struct sde_drm_ubwc_stats_roi - region of interest for ubwc stats
- * y_coord0: first y offset from top of display
- * y_coord1: second y offset from top of display
- */
-struct sde_drm_ubwc_stats_roi {
-	__u16 y_coord0;
-	__u16 y_coord1;
-};
-
-/**
- * struct sde_drm_ubwc_stats_data: ubwc statistics
- * roi: region of interest
- * worst_bw: worst bandwidth, per roi
- * worst_bw_y_coord: y offset (row) location of worst bandwidth, per roi
- * total_bw: total bandwidth, per roi
- * error: error status
- * meta_error: meta error data
- */
-struct sde_drm_ubwc_stats_data {
-	struct sde_drm_ubwc_stats_roi roi;
-	__u16 worst_bw[UBWC_STATS_MAX_ROI];
-	__u16 worst_bw_y_coord[UBWC_STATS_MAX_ROI];
-	__u32 total_bw[UBWC_STATS_MAX_ROI];
-	__u32 error;
-	__u32 meta_error;
-};
-
-/**
- * Define frame data config
- */
-#define SDE_FRAME_DATA_BUFFER_MAX	0x3
-#define SDE_FRAME_DATA_GUARD_BYTES	0xFF
-#define SDE_FRAME_DATA_MAX_PLANES	0x10
-
-/**
- * struct sde_drm_frame_data_buffers_ctrl - control frame data buffers
- * num_buffers: number of allocated buffers
- * fds: fd list for allocated buffers
- */
-struct sde_drm_frame_data_buffers_ctrl {
-	__u32 num_buffers;
-	__u32 fds[SDE_FRAME_DATA_BUFFER_MAX];
-};
-
-/**
- * struct sde_drm_frame_data_buf - frame data buffer info sent to userspace
- * fd: buffer fd
- * offset: offset from buffer address
- * status: status flag
- */
-struct sde_drm_frame_data_buf {
-	__u32 fd;
-	__u32 offset;
-	__u32 status;
-};
-
-/**
- * struct sde_drm_plane_frame_data - definition of plane frame data struct
- * plane_id: drm plane id
- * ubwc_stats: ubwc statistics
- */
-struct sde_drm_plane_frame_data {
-	__u32 plane_id;
-
-	struct sde_drm_ubwc_stats_data ubwc_stats;
-};
-
-/**
- * struct sde_drm_frame_data_packet - definition of frame data struct
- * frame_count: interface frame count
- * commit_count: sw commit count
- * plane_frame_data: data available per plane
- */
-struct sde_drm_frame_data_packet {
-	__u32 frame_count;
-	__u64 commit_count;
-
-	struct sde_drm_plane_frame_data plane_frame_data[SDE_FRAME_DATA_MAX_PLANES];
-};
 
 /*
  * Colorimetry Data Block values
@@ -788,29 +649,6 @@ struct drm_msm_display_hint {
 	__u32 hint_flags;
 };
 
-#define DRM_NOISE_LAYER_CFG
-#define DRM_NOISE_TEMPORAL_FLAG (1 << 0)
-#define DRM_NOISE_ATTN_MAX 255
-#define DRM_NOISE_STREN_MAX 6
-
-/**
- * struct drm_msm_noise_layer_cfg: Payload to enable/disable noise blend
- * @flags: operation control flags, for future use
- * @zposn: noise zorder
- * @zposattn: attenuation zorder
- * @attn_factor: attenuation factor in range of 1 to 255
- * @stength: strength in range of 0 to 6
- * @alpha_noise: attenuation in range of 1 to 255
-*/
-struct drm_msm_noise_layer_cfg {
-	__u64 flags;
-	__u32 zposn;
-	__u32 zposattn;
-	__u32 attn_factor;
-	__u32 strength;
-	__u32 alpha_noise;
-};
-
 #define DRM_SDE_WB_CONFIG              0x40
 #define DRM_MSM_REGISTER_EVENT         0x41
 #define DRM_MSM_DEREGISTER_EVENT       0x42
@@ -830,17 +668,6 @@ struct drm_msm_noise_layer_cfg {
 #define DRM_EVENT_LTM_HIST 0X80000008
 #define DRM_EVENT_LTM_WB_PB 0X80000009
 #define DRM_EVENT_LTM_OFF 0X8000000A
-#define DRM_EVENT_MMRM_CB 0X8000000B
-#define DRM_EVENT_FRAME_DATA 0x8000000C
-#define DRM_EVENT_DIMMING_BL 0X8000000D
-#define DRM_EVENT_VM_RELEASE 0X8000000E
-
-#ifndef DRM_MODE_FLAG_VID_MODE_PANEL
-#define DRM_MODE_FLAG_VID_MODE_PANEL        0x01
-#endif
-#ifndef DRM_MODE_FLAG_CMD_MODE_PANEL
-#define DRM_MODE_FLAG_CMD_MODE_PANEL        0x02
-#endif
 
 /* display hint flags*/
 #define DRM_MSM_DISPLAY_EARLY_WAKEUP_HINT         0x01

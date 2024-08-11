@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * Copyright (c) 2020-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  */
 #ifndef __MMM_COLOR_FMT_INFO_H__
 #define __MMM_COLOR_FMT_INFO_H__
@@ -48,10 +48,10 @@ enum mmm_color_fmts {
 	 * . . . . . . . . . . . . . . . .  V
 	 * . . . . . . . . . . . . . . . .  --> Buffer size alignment
 	 *
-	 * Y_Stride : Width aligned to 128
-	 * UV_Stride : Width aligned to 128
-	 * Y_Scanlines: Height aligned to 32
-	 * UV_Scanlines: Height/2 aligned to 16
+	 * Y_Stride : Width aligned to 512
+	 * UV_Stride : Width aligned to 512
+	 * Y_Scanlines: Height aligned to 512
+	 * UV_Scanlines: Height/2 aligned to 256
 	 * Total size = align(Y_Stride * Y_Scanlines
 	 *          + UV_Stride * UV_Scanlines, 4096)
 	 */
@@ -83,10 +83,10 @@ enum mmm_color_fmts {
 	 * . . . . . . . . . . . . . . . .  V
 	 * . . . . . . . . . . . . . . . .  --> Padding & Buffer size alignment
 	 *
-	 * Y_Stride : Width aligned to 128
-	 * UV_Stride : Width aligned to 128
-	 * Y_Scanlines: Height aligned to 32
-	 * UV_Scanlines: Height/2 aligned to 16
+	 * Y_Stride : Width aligned to 512
+	 * UV_Stride : Width aligned to 512
+	 * Y_Scanlines: Height aligned to 512
+	 * UV_Scanlines: Height/2 aligned to 256
 	 * Total size = align(Y_Stride * Y_Scanlines
 	 *          + UV_Stride * UV_Scanlines, 4096)
 	 */
@@ -466,7 +466,7 @@ enum mmm_color_fmts {
 	 * . . . . . . . . . . . . . . . .              |
 	 * . . . . . . . . . . . . . . . .              V
 	 *
-	 * RGB_Stride = align(Width * 4, 256)
+	 * RGB_Stride = align(Width * 4, 128)
 	 * RGB_Scanlines = align(Height, 32)
 	 * RGB_Plane_size = align(RGB_Stride * RGB_Scanlines, 4096)
 	 *
@@ -730,41 +730,6 @@ enum mmm_color_fmts {
 	 *          + UV_Stride * UV_Scanlines, 4096)
 	 */
 	MMM_COLOR_FMT_P010,
-	/* Venus P010_512:
-	 * YUV 4:2:0 image with a plane of 10 bit Y samples followed
-	 * by an interleaved U/V plane containing 10 bit 2x2 subsampled
-	 * colour difference samples.
-	 *
-	 * <-------- Y/UV_Stride -------->
-	 * <------- Width ------->
-	 * Y Y Y Y Y Y Y Y Y Y Y Y . . . .  ^           ^
-	 * Y Y Y Y Y Y Y Y Y Y Y Y . . . .  |           |
-	 * Y Y Y Y Y Y Y Y Y Y Y Y . . . .  Height      |
-	 * Y Y Y Y Y Y Y Y Y Y Y Y . . . .  |          Y_Scanlines
-	 * Y Y Y Y Y Y Y Y Y Y Y Y . . . .  |           |
-	 * Y Y Y Y Y Y Y Y Y Y Y Y . . . .  |           |
-	 * Y Y Y Y Y Y Y Y Y Y Y Y . . . .  |           |
-	 * Y Y Y Y Y Y Y Y Y Y Y Y . . . .  V           |
-	 * . . . . . . . . . . . . . . . .              |
-	 * . . . . . . . . . . . . . . . .              |
-	 * . . . . . . . . . . . . . . . .              |
-	 * . . . . . . . . . . . . . . . .              V
-	 * U V U V U V U V U V U V . . . .  ^
-	 * U V U V U V U V U V U V . . . .  |
-	 * U V U V U V U V U V U V . . . .  |
-	 * U V U V U V U V U V U V . . . .  UV_Scanlines
-	 * . . . . . . . . . . . . . . . .  |
-	 * . . . . . . . . . . . . . . . .  V
-	 * . . . . . . . . . . . . . . . .  --> Buffer size alignment
-	 *
-	 * Y_Stride : Width * 2 aligned to 512
-	 * UV_Stride : Width * 2 aligned to 512
-	 * Y_Scanlines: Height aligned to 32
-	 * UV_Scanlines: Height/2 aligned to 16
-	 * Total size = align(Y_Stride * Y_Scanlines
-	 *          + UV_Stride * UV_Scanlines, 4096)
-	 */
-	MMM_COLOR_FMT_P010_512,
 	/* Venus NV12_512:
 	 * YUV 4:2:0 image with a plane of 8 bit Y samples followed
 	 * by an interleaved U/V plane containing 8 bit 2x2 subsampled
@@ -800,52 +765,6 @@ enum mmm_color_fmts {
 	 *          + UV_Stride  * UV_Scanlines), 4096)
 	 */
 	MMM_COLOR_FMT_NV12_512,
-	/* Venus RGBA FP16 UBWC:
-	 * Contains 2 planes in the following order -
-	 * (A) Meta plane
-	 * (B) RGBA plane
-	 *
-	 * <--- RGB_Meta_Stride ---->
-	 * <-------- Width ------>
-	 * M M M M M M M M M M M M . .      ^           ^
-	 * M M M M M M M M M M M M . .      |           |
-	 * M M M M M M M M M M M M . .      Height      |
-	 * M M M M M M M M M M M M . .      |       Meta_RGB_Scanlines
-	 * M M M M M M M M M M M M . .      |           |
-	 * M M M M M M M M M M M M . .      |           |
-	 * M M M M M M M M M M M M . .      |           |
-	 * M M M M M M M M M M M M . .      V           |
-	 * . . . . . . . . . . . . . .                  |
-	 * . . . . . . . . . . . . . .                  |
-	 * . . . . . . . . . . . . . .      -------> Buffer size aligned to 4k
-	 * . . . . . . . . . . . . . .                  V
-	 * <-------- RGB_Stride -------->
-	 * <------- Width ------->
-	 * R R R R R R R R R R R R . . . .  ^           ^
-	 * R R R R R R R R R R R R . . . .  |           |
-	 * R R R R R R R R R R R R . . . .  Height      |
-	 * R R R R R R R R R R R R . . . .  |       RGB_Scanlines
-	 * R R R R R R R R R R R R . . . .  |           |
-	 * R R R R R R R R R R R R . . . .  |           |
-	 * R R R R R R R R R R R R . . . .  |           |
-	 * R R R R R R R R R R R R . . . .  V           |
-	 * . . . . . . . . . . . . . . . .              |
-	 * . . . . . . . . . . . . . . . .              |
-	 * . . . . . . . . . . . . . . . .    -------> Buffer size aligned to 4k
-	 * . . . . . . . . . . . . . . . .              V
-	 *
-	 * RGB_Stride = align(Width * 8, 256)
-	 * RGB_Scanlines = align(Height, 16)
-	 * RGB_Plane_size = align(RGB_Stride * RGB_Scanlines, 4096)
-	 * RGB_Meta_Stride = align(roundup(Width, RGB_TileWidth), 64)
-	 * RGB_Meta_Scanline = align(roundup(Height, RGB_TileHeight), 16)
-	 * RGB_Meta_Plane_size = align(RGB_Meta_Stride *
-	 *              RGB_Meta_Scanlines, 4096)
-	 * RGB_TileWidth = 8 pixels across is 1 tile
-	 * RGB_TileHeight = 4 pixels
-	 * Total size = align(RGB_Meta_Plane_size + RGB_Plane_size, 4096)
-	 */
-	MMM_COLOR_FMT_RGBA16161616F_UBWC,
 };
 
 /*
@@ -855,7 +774,7 @@ enum mmm_color_fmts {
  * Progressive: width
  * Interlaced: width
  */
-static inline unsigned int MMM_COLOR_FMT_Y_STRIDE(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_Y_STRIDE(unsigned int color_fmt,
 	unsigned int width)
 {
 	unsigned int alignment, stride = 0;
@@ -864,12 +783,12 @@ static inline unsigned int MMM_COLOR_FMT_Y_STRIDE(unsigned int color_fmt,
 		goto invalid_input;
 
 	switch (color_fmt) {
+	case MMM_COLOR_FMT_NV12:
+	case MMM_COLOR_FMT_NV21:
 	case MMM_COLOR_FMT_NV12_512:
 		alignment = 512;
 		stride = MMM_COLOR_FMT_ALIGN(width, alignment);
 		break;
-	case MMM_COLOR_FMT_NV12:
-	case MMM_COLOR_FMT_NV21:
 	case MMM_COLOR_FMT_NV12_UBWC:
 		alignment = 128;
 		stride = MMM_COLOR_FMT_ALIGN(width, alignment);
@@ -884,9 +803,6 @@ static inline unsigned int MMM_COLOR_FMT_Y_STRIDE(unsigned int color_fmt,
 		alignment = 256;
 		stride = MMM_COLOR_FMT_ALIGN(width * 2, alignment);
 		break;
-	case MMM_COLOR_FMT_P010_512:
-		alignment = 512;
-		stride = MMM_COLOR_FMT_ALIGN(width * 2, alignment);
 	default:
 		break;
 	}
@@ -901,7 +817,7 @@ invalid_input:
  * Progressive: width
  * Interlaced: width
  */
-static inline unsigned int MMM_COLOR_FMT_UV_STRIDE(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_UV_STRIDE(unsigned int color_fmt,
 	unsigned int width)
 {
 	unsigned int alignment, stride = 0;
@@ -910,12 +826,12 @@ static inline unsigned int MMM_COLOR_FMT_UV_STRIDE(unsigned int color_fmt,
 		goto invalid_input;
 
 	switch (color_fmt) {
+	case MMM_COLOR_FMT_NV21:
+	case MMM_COLOR_FMT_NV12:
 	case MMM_COLOR_FMT_NV12_512:
 		alignment = 512;
 		stride = MMM_COLOR_FMT_ALIGN(width, alignment);
 		break;
-	case MMM_COLOR_FMT_NV12:
-	case MMM_COLOR_FMT_NV21:
 	case MMM_COLOR_FMT_NV12_UBWC:
 		alignment = 128;
 		stride = MMM_COLOR_FMT_ALIGN(width, alignment);
@@ -928,10 +844,6 @@ static inline unsigned int MMM_COLOR_FMT_UV_STRIDE(unsigned int color_fmt,
 	case MMM_COLOR_FMT_P010_UBWC:
 	case MMM_COLOR_FMT_P010:
 		alignment = 256;
-		stride = MMM_COLOR_FMT_ALIGN(width * 2, alignment);
-		break;
-	case MMM_COLOR_FMT_P010_512:
-		alignment = 512;
 		stride = MMM_COLOR_FMT_ALIGN(width * 2, alignment);
 		break;
 	default:
@@ -948,7 +860,7 @@ invalid_input:
  * Progressive: height
  * Interlaced: (height+1)>>1
  */
-static inline unsigned int MMM_COLOR_FMT_Y_SCANLINES(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_Y_SCANLINES(unsigned int color_fmt,
 	unsigned int height)
 {
 	unsigned int alignment, sclines = 0;
@@ -957,13 +869,12 @@ static inline unsigned int MMM_COLOR_FMT_Y_SCANLINES(unsigned int color_fmt,
 		goto invalid_input;
 
 	switch (color_fmt) {
+	case MMM_COLOR_FMT_NV12:
+	case MMM_COLOR_FMT_NV21:
 	case MMM_COLOR_FMT_NV12_512:
 		alignment = 512;
 		break;
-	case MMM_COLOR_FMT_NV12:
-	case MMM_COLOR_FMT_NV21:
 	case MMM_COLOR_FMT_NV12_UBWC:
-	case MMM_COLOR_FMT_P010_512:
 	case MMM_COLOR_FMT_P010:
 		alignment = 32;
 		break;
@@ -986,7 +897,7 @@ invalid_input:
  * Progressive: height
  * Interlaced: (height+1)>>1
  */
-static inline unsigned int MMM_COLOR_FMT_UV_SCANLINES(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_UV_SCANLINES(unsigned int color_fmt,
 	unsigned int height)
 {
 	unsigned int alignment, sclines = 0;
@@ -995,15 +906,13 @@ static inline unsigned int MMM_COLOR_FMT_UV_SCANLINES(unsigned int color_fmt,
 		goto invalid_input;
 
 	switch (color_fmt) {
-
+	case MMM_COLOR_FMT_NV21:
+	case MMM_COLOR_FMT_NV12:
 	case MMM_COLOR_FMT_NV12_512:
 		alignment = 256;
 		break;
-	case MMM_COLOR_FMT_NV12:
-	case MMM_COLOR_FMT_NV21:
 	case MMM_COLOR_FMT_NV12_BPP10_UBWC:
 	case MMM_COLOR_FMT_P010_UBWC:
-	case MMM_COLOR_FMT_P010_512:
 	case MMM_COLOR_FMT_P010:
 		alignment = 16;
 		break;
@@ -1027,7 +936,7 @@ invalid_input:
  * Progressive: width
  * Interlaced: width
  */
-static inline unsigned int MMM_COLOR_FMT_Y_META_STRIDE(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_Y_META_STRIDE(unsigned int color_fmt,
 	unsigned int width)
 {
 	int y_tile_width = 0, y_meta_stride = 0;
@@ -1061,7 +970,7 @@ invalid_input:
  * Progressive: height
  * Interlaced: (height+1)>>1
  */
-static inline unsigned int MMM_COLOR_FMT_Y_META_SCANLINES(
+static __inline__ unsigned int MMM_COLOR_FMT_Y_META_SCANLINES(
 		unsigned int color_fmt,	unsigned int height)
 {
 	int y_tile_height = 0, y_meta_scanlines = 0;
@@ -1095,7 +1004,7 @@ invalid_input:
  * Progressive: width
  * Interlaced: width
  */
-static inline unsigned int MMM_COLOR_FMT_UV_META_STRIDE(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_UV_META_STRIDE(unsigned int color_fmt,
 	unsigned int width)
 {
 	int uv_tile_width = 0, uv_meta_stride = 0;
@@ -1129,7 +1038,7 @@ invalid_input:
  * Progressive: height
  * Interlaced: (height+1)>>1
  */
-static inline unsigned int MMM_COLOR_FMT_UV_META_SCANLINES(
+static __inline__ unsigned int MMM_COLOR_FMT_UV_META_SCANLINES(
 		unsigned int color_fmt,	unsigned int height)
 {
 	int uv_tile_height = 0, uv_meta_scanlines = 0;
@@ -1157,7 +1066,7 @@ invalid_input:
 	return uv_meta_scanlines;
 }
 
-static inline unsigned int MMM_COLOR_FMT_RGB_STRIDE(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_RGB_STRIDE(unsigned int color_fmt,
 	unsigned int width)
 {
 	unsigned int alignment = 0, stride = 0, bpp = 4;
@@ -1167,7 +1076,7 @@ static inline unsigned int MMM_COLOR_FMT_RGB_STRIDE(unsigned int color_fmt,
 
 	switch (color_fmt) {
 	case MMM_COLOR_FMT_RGBA8888:
-		alignment = 256;
+		alignment = 128;
 		break;
 	case MMM_COLOR_FMT_RGB565_UBWC:
 		alignment = 256;
@@ -1176,10 +1085,6 @@ static inline unsigned int MMM_COLOR_FMT_RGB_STRIDE(unsigned int color_fmt,
 	case MMM_COLOR_FMT_RGBA8888_UBWC:
 	case MMM_COLOR_FMT_RGBA1010102_UBWC:
 		alignment = 256;
-		break;
-	case MMM_COLOR_FMT_RGBA16161616F_UBWC:
-		alignment = 256;
-		bpp = 8;
 		break;
 	default:
 		goto invalid_input;
@@ -1191,7 +1096,7 @@ invalid_input:
 	return stride;
 }
 
-static inline unsigned int MMM_COLOR_FMT_RGB_SCANLINES(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_RGB_SCANLINES(unsigned int color_fmt,
 	unsigned int height)
 {
 	unsigned int alignment = 0, scanlines = 0;
@@ -1206,7 +1111,6 @@ static inline unsigned int MMM_COLOR_FMT_RGB_SCANLINES(unsigned int color_fmt,
 	case MMM_COLOR_FMT_RGBA8888_UBWC:
 	case MMM_COLOR_FMT_RGBA1010102_UBWC:
 	case MMM_COLOR_FMT_RGB565_UBWC:
-	case MMM_COLOR_FMT_RGBA16161616F_UBWC:
 		alignment = 16;
 		break;
 	default:
@@ -1219,7 +1123,7 @@ invalid_input:
 	return scanlines;
 }
 
-static inline unsigned int MMM_COLOR_FMT_RGB_META_STRIDE(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_RGB_META_STRIDE(unsigned int color_fmt,
 	unsigned int width)
 {
 	int rgb_tile_width = 0, rgb_meta_stride = 0;
@@ -1233,9 +1137,6 @@ static inline unsigned int MMM_COLOR_FMT_RGB_META_STRIDE(unsigned int color_fmt,
 	case MMM_COLOR_FMT_RGB565_UBWC:
 		rgb_tile_width = 16;
 		break;
-	case MMM_COLOR_FMT_RGBA16161616F_UBWC:
-		rgb_tile_width = 8;
-		break;
 	default:
 		goto invalid_input;
 	}
@@ -1247,7 +1148,7 @@ invalid_input:
 	return rgb_meta_stride;
 }
 
-static inline unsigned int MMM_COLOR_FMT_RGB_META_SCANLINES(
+static __inline__ unsigned int MMM_COLOR_FMT_RGB_META_SCANLINES(
 		unsigned int color_fmt,	unsigned int height)
 {
 	int rgb_tile_height = 0, rgb_meta_scanlines = 0;
@@ -1259,7 +1160,6 @@ static inline unsigned int MMM_COLOR_FMT_RGB_META_SCANLINES(
 	case MMM_COLOR_FMT_RGBA8888_UBWC:
 	case MMM_COLOR_FMT_RGBA1010102_UBWC:
 	case MMM_COLOR_FMT_RGB565_UBWC:
-	case MMM_COLOR_FMT_RGBA16161616F_UBWC:
 		rgb_tile_height = 4;
 		break;
 	default:
@@ -1283,7 +1183,7 @@ invalid_input:
  * Progressive: height
  * Interlaced: height
  */
-static inline unsigned int MMM_COLOR_FMT_BUFFER_SIZE(unsigned int color_fmt,
+static __inline__ unsigned int MMM_COLOR_FMT_BUFFER_SIZE(unsigned int color_fmt,
 	unsigned int width, unsigned int height)
 {
 	unsigned int size = 0;
@@ -1310,7 +1210,6 @@ static inline unsigned int MMM_COLOR_FMT_BUFFER_SIZE(unsigned int color_fmt,
 	switch (color_fmt) {
 	case MMM_COLOR_FMT_NV21:
 	case MMM_COLOR_FMT_NV12:
-	case MMM_COLOR_FMT_P010_512:
 	case MMM_COLOR_FMT_P010:
 	case MMM_COLOR_FMT_NV12_512:
 		y_plane = y_stride * y_sclines;
@@ -1407,7 +1306,6 @@ static inline unsigned int MMM_COLOR_FMT_BUFFER_SIZE(unsigned int color_fmt,
 	case MMM_COLOR_FMT_RGBA8888_UBWC:
 	case MMM_COLOR_FMT_RGBA1010102_UBWC:
 	case MMM_COLOR_FMT_RGB565_UBWC:
-	case MMM_COLOR_FMT_RGBA16161616F_UBWC:
 		rgb_ubwc_plane = MMM_COLOR_FMT_ALIGN(rgb_stride * rgb_scanlines,
 							4096);
 		rgb_meta_stride = MMM_COLOR_FMT_RGB_META_STRIDE(color_fmt,
@@ -1425,7 +1323,7 @@ invalid_input:
 	return MMM_COLOR_FMT_ALIGN(size, 4096);
 }
 
-static inline unsigned int MMM_COLOR_FMT_BUFFER_SIZE_USED(
+static __inline__ unsigned int MMM_COLOR_FMT_BUFFER_SIZE_USED(
 		unsigned int color_fmt,	unsigned int width,
 		unsigned int height, unsigned int interlace)
 {

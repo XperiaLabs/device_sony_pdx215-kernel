@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
- * Copyright (c) 2020-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  */
 
 #ifndef _LINUX_MEM_BUF_H
@@ -20,8 +19,6 @@ enum mem_buf_mem_type {
 	MEM_BUF_ION_MEM_TYPE,
 	MEM_BUF_MAX_MEM_TYPE,
 };
-#define MEM_BUF_DMAHEAP_MEM_TYPE (MEM_BUF_ION_MEM_TYPE + 1)
-/* RESERVED for MEM_BUF_BUDDY_MEM_TYPE: MEM_BUF_ION_MEM_TYPE + 2 */
 
 /* The mem-buf values that represent VMIDs for an ACL. */
 #define MEM_BUF_VMID_PRIMARY_VM 0
@@ -56,16 +53,6 @@ struct acl_entry {
  */
 struct mem_buf_ion_data {
 	__u32 heap_id;
-};
-
-#define MEM_BUF_MAX_DMAHEAP_NAME_LEN 128
-/**
- * struct mem_buf_dmaheap_data: Data that is unique to memory that is of type
- * MEM_BUF_DMAHEAP_MEM_TYPE.
- * @heap_name: array of characters containing the heap name.
- */
-struct mem_buf_dmaheap_data {
-	__u64 heap_name;
 };
 
 /**
@@ -111,127 +98,65 @@ struct mem_buf_alloc_ioctl_arg {
 					      struct mem_buf_alloc_ioctl_arg)
 
 /**
- * struct mem_buf_lend_ioctl_arg: A request to lend memory from the local VM
- * VM to one or more remote VMs.
+ * struct mem_buf_export_ioctl_arg: An request to allocate memory from another
+ * VM to other VMs.
  * @dma_buf_fd: The fd of the dma-buf that will be exported to another VM.
  * @nr_acl_entries: The number of ACL entries in @acl_list.
  * @acl_list: An array of structures, where each structure specifies a VMID
  * and the access permissions that the VMID will have to the memory to be
- * exported. Must not include the local VMID.
+ * exported.
+ * @export_fd: An fd that corresponds to the buffer that was exported. This fd
+ * must be kept open until it is no longer required to export the memory to
+ * another VM.
  * @memparcel_hdl: The handle associated with the memparcel that was created by
  * granting access to the dma-buf for the VMIDs specified in @acl_list.
  *
+ * Note: The buffer must not be mmap'ed by any process prior to invoking this
+ * IOCTL. The buffer must also be a cached buffer from a non-secure ION heap.
+ *
  * All reserved fields must be zeroed out by the caller prior to invoking the
- * import IOCTL command with this argument.
+ * export IOCTL command with this argument.
  */
-struct mem_buf_lend_ioctl_arg {
+struct mem_buf_export_ioctl_arg {
 	__u32 dma_buf_fd;
 	__u32 nr_acl_entries;
 	__u64 acl_list;
-	__u64 memparcel_hdl;
+	__u32 export_fd;
+	__u32 memparcel_hdl;
 	__u64 reserved0;
 	__u64 reserved1;
 	__u64 reserved2;
 };
 
-#define MEM_BUF_IOC_LEND		_IOWR(MEM_BUF_IOC_MAGIC, 3,\
-					      struct mem_buf_lend_ioctl_arg)
+#define MEM_BUF_IOC_EXPORT		_IOWR(MEM_BUF_IOC_MAGIC, 1,\
+					      struct mem_buf_export_ioctl_arg)
 
-#define MEM_BUF_VALID_FD_FLAGS (O_CLOEXEC | O_ACCMODE)
 /**
- * struct mem_buf_retrieve_ioctl_arg: A request to retrieve memory from another
+ * struct mem_buf_import_ioctl_arg: A request to import memory from another
  * VM as a dma-buf
- * @sender_vm_fd: An open file descriptor identifing the VM who sent the handle.
+ * @memparcel_hdl: The handle that corresponds to the memparcel we are
+ * importing.
  * @nr_acl_entries: The number of ACL entries in @acl_list.
  * @acl_list: An array of structures, where each structure specifies a VMID
  * and the access permissions that the VMID should have for the memparcel.
- * @memparcel_hdl: The handle that corresponds to the memparcel we are
- * importing.
  * @dma_buf_import_fd: A dma-buf file descriptor that the client can use to
  * access the buffer. This fd must be closed to release the memory.
- * @fd_flags:		file descriptor flags used when allocating
  *
  * All reserved fields must be zeroed out by the caller prior to invoking the
  * import IOCTL command with this argument.
  */
-struct mem_buf_retrieve_ioctl_arg {
-	__u32 sender_vm_fd;
+struct mem_buf_import_ioctl_arg {
+	__u32 memparcel_hdl;
 	__u32 nr_acl_entries;
 	__u64 acl_list;
-	__u64 memparcel_hdl;
 	__u32 dma_buf_import_fd;
-	__u32 fd_flags;
-	__u64 reserved0;
-	__u64 reserved1;
-	__u64 reserved2;
-};
-
-#define MEM_BUF_IOC_RETRIEVE		_IOWR(MEM_BUF_IOC_MAGIC, 4,\
-					      struct mem_buf_retrieve_ioctl_arg)
-
-/**
- * struct mem_buf_reclaim_ioctl_arg: A request to reclaim memory from another
- * VM. The other VM must have relinquished access, and the current VM must be
- * the original owner of the memory. The dma-buf file will not be closed by
- * this operation.
- * @memparcel_hdl: The handle that corresponds to the memparcel we are
- * reclaiming.
- * @dma_buf_fd: A dma-buf file descriptor that the client can use to
- * access the buffer.
- *
- * All reserved fields must be zeroed out by the caller prior to invoking the
- * import IOCTL command with this argument.
- */
-struct mem_buf_reclaim_ioctl_arg {
-	__u64 memparcel_hdl;
-	__u32 dma_buf_fd;
 	__u32 reserved0;
 	__u64 reserved1;
 	__u64 reserved2;
+	__u64 reserved3;
 };
 
-#define MEM_BUF_IOC_RECLAIM		_IOWR(MEM_BUF_IOC_MAGIC, 3,\
-					      struct mem_buf_reclaim_ioctl_arg)
-
-/**
- * struct mem_buf_share_ioctl_arg: An request to share memory between the
- * local VM and one or more remote VMs.
- * @dma_buf_fd: The fd of the dma-buf that will be exported to another VM.
- * @nr_acl_entries: The number of ACL entries in @acl_list.
- * @acl_list: An array of structures, where each structure specifies a VMID
- * and the access permissions that the VMID will have to the memory to be
- * exported. Must include the local VMID.
- * @memparcel_hdl: The handle associated with the memparcel that was created by
- * granting access to the dma-buf for the VMIDs specified in @acl_list.
- *
- * All reserved fields must be zeroed out by the caller prior to invoking the
- * import IOCTL command with this argument.
- */
-struct mem_buf_share_ioctl_arg {
-	__u32 dma_buf_fd;
-	__u32 nr_acl_entries;
-	__u64 acl_list;
-	__u64 memparcel_hdl;
-	__u64 reserved0;
-	__u64 reserved1;
-	__u64 reserved2;
-};
-
-#define MEM_BUF_IOC_SHARE		_IOWR(MEM_BUF_IOC_MAGIC, 6,\
-					      struct mem_buf_share_ioctl_arg)
-
-/**
- * struct mem_buf_exclusive_owner_ioctl_arg: A request to see if a DMA-BUF
- * is owned by and belongs exclusively to this VM.
- * @dma_buf_fd: The fd of the dma-buf the user wants to obtain information on
- * @is_exclusive_owner:
- */
-struct mem_buf_exclusive_owner_ioctl_arg {
-	__u32 dma_buf_fd;
-	__u32 is_exclusive_owner;
-};
-
-#define MEM_BUF_IOC_EXCLUSIVE_OWNER	_IOWR(MEM_BUF_IOC_MAGIC, 2,\
-					      struct mem_buf_exclusive_owner_ioctl_arg)
+#define MEM_BUF_IOC_IMPORT		_IOWR(MEM_BUF_IOC_MAGIC, 2,\
+					      struct mem_buf_import_ioctl_arg)
 
 #endif /* _LINUX_MEM_BUF_H */

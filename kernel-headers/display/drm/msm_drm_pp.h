@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
- * Copyright (c) 2017-2021, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2017-2020, The Linux Foundation. All rights reserved.
  */
 
 #ifndef _MSM_DRM_PP_H_
@@ -573,7 +572,6 @@ struct drm_msm_ltm_buffer {
 #define SPR_INIT_PARAM_SIZE_3 16
 #define SPR_INIT_PARAM_SIZE_4 24
 #define SPR_INIT_PARAM_SIZE_5 32
-#define SPR_FLAG_BYPASS (1 << 0)
 
 /**
  * struct drm_msm_spr_init_cfg - SPR initial configuration structure
@@ -683,65 +681,6 @@ struct drm_msm_rc_mask_cfg {
 	__u64 cfg_param_07;
 	__u32 cfg_param_08;
 	__u64 cfg_param_09[RC_DATA_SIZE_MAX];
-	__u32 height;
-	__u32 width;
-};
-
-#define FP16_SUPPORTED
-#define FP16_GC_FLAG_ALPHA_EN (1 << 0)
-
- /* FP16 GC mode options */
-#define FP16_GC_MODE_INVALID 0
-#define FP16_GC_MODE_SRGB 1
-#define FP16_GC_MODE_PQ 2
-
-/**
- * struct drm_msm_fp16_gc - FP16 GC configuration structure
- * @in flags - Settings flags for FP16 GC
- * @in mode - Gamma correction mode to use for FP16 GC
- */
-struct drm_msm_fp16_gc {
-	__u64 flags;
-	__u64 mode;
-};
-
-/**
- * struct drm_msm_fp16_csc - FP16 CSC configuration structure
- * @in flags - Settings flags for FP16 CSC. Currently unused
- * @in cfg_param_0_len - Length of data for cfg_param_0
- * @in cfg_param_0 - Data for param 0. Max size is FP16_CSC_CFG0_PARAM_LEN
- * @in cfg_param_1_len - Length of data for cfg_param_1
- * @in cfg_param_1 - Data for param 1. Max size is FP16_CSC_CFG1_PARAM_LEN
- */
-#define FP16_CSC_CFG0_PARAM_LEN 12
-#define FP16_CSC_CFG1_PARAM_LEN 8
-struct drm_msm_fp16_csc {
-	__u64 flags;
-	__u32 cfg_param_0_len;
-	__u32 cfg_param_0[FP16_CSC_CFG0_PARAM_LEN];
-	__u32 cfg_param_1_len;
-	__u32 cfg_param_1[FP16_CSC_CFG1_PARAM_LEN];
-};
-
-#define DIMMING_ENABLE (1 << 0)
-#define DIMMING_MIN_BL_VALID (1 << 1)
-struct drm_msm_backlight_info {
-	__u32 brightness_max;
-	__u32 brightness;
-	__u32 bl_level_max;
-	__u32 bl_level;
-	__u32 bl_scale;
-	__u32 bl_scale_sv;
-	__u32 status;
-	__u32 min_bl;
-	__u32 bl_scale_max;
-	__u32 bl_scale_sv_max;
-};
-
-#define DIMMING_BL_LUT_LEN 8192
-struct drm_msm_dimming_bl_lut {
-	__u32 length;
-	__u32 mapped_bl[DIMMING_BL_LUT_LEN];
 };
 
 #endif /* _MSM_DRM_PP_H_ */

@@ -408,39 +408,40 @@ struct virtio_crypto_op_data_req {
 #define VIRTIO_CRYPTO_BADMSG    2
 #define VIRTIO_CRYPTO_NOTSUPP   3
 #define VIRTIO_CRYPTO_INVSESS   4 /* Invalid session id */
+#define VIRTIO_CRYPTO_NOSPC     5 /* no free session ID */
 
 /* The accelerator hardware is ready */
 #define VIRTIO_CRYPTO_S_HW_READY  (1 << 0)
 
 struct virtio_crypto_config {
 	/* See VIRTIO_CRYPTO_OP_* above */
-	__le32  status;
+	__u32  status;
 
 	/*
 	 * Maximum number of data queue
 	 */
-	__le32  max_dataqueues;
+	__u32  max_dataqueues;
 
 	/*
 	 * Specifies the services mask which the device support,
 	 * see VIRTIO_CRYPTO_SERVICE_* above
 	 */
-	__le32 crypto_services;
+	__u32 crypto_services;
 
 	/* Detailed algorithms mask */
-	__le32 cipher_algo_l;
-	__le32 cipher_algo_h;
-	__le32 hash_algo;
-	__le32 mac_algo_l;
-	__le32 mac_algo_h;
-	__le32 aead_algo;
+	__u32 cipher_algo_l;
+	__u32 cipher_algo_h;
+	__u32 hash_algo;
+	__u32 mac_algo_l;
+	__u32 mac_algo_h;
+	__u32 aead_algo;
 	/* Maximum length of cipher key */
-	__le32 max_cipher_key_len;
+	__u32 max_cipher_key_len;
 	/* Maximum length of authenticated key */
-	__le32 max_auth_key_len;
-	__le32 reserve;
+	__u32 max_auth_key_len;
+	__u32 reserve;
 	/* Maximum size of each crypto request's content */
-	__le64 max_size;
+	__u64 max_size;
 };
 
 struct virtio_crypto_inhdr {
