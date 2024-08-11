@@ -1,0 +1,5 @@
+# Aliases extracted from modules themselves.
+alias of:N*T*Cqcom,msm-audio-apr apr_dlkm
+alias of:N*T*Cqcom,msm-audio-aprC* apr_dlkm
+alias of:N*T*Cqcom,adsp-loader adsp_loader_dlkm
+alias of:N*T*Cqcom,adsp-loaderC* adsp_loader_dlkm
